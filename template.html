@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Snake N Ladder</title>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+	</head>
+	<body>
+		<div class="layers" >
+			<div class="grey-layer" intro="fade"></div>
+			<div class="names-layer" intro="fade">
+				<div class="layer-title">
+					<h3>
+						Hi! Please provide names of playes
+					</h3>
+				</div>
+				<div class="layer-content">
+					<form id="names-form">
+						<input type="text" name="name[]" value="" placeholder="First player" class="layer-input"/>
+						<input type="text" name="name[]" value="" placeholder="Second player" class="layer-input"/>
+						<input type="text" name="name[]" value="" placeholder="Third player" class="layer-input"/>
+					</form>
+				</div>
+				<div class="layer-footer">
+					<button class="btn start_but">Start</button>
+				</div>
+			</div>
+		</div>
+		<div class="clearfix">
+			<div class="main-board lt">
+				<div class="player-token emerald"></div>
+				<div class="player-token pumpkin" style="top:40px;left:0px;"></div>
+				<div class="player-token wisteria" style="top:40px;left:40px;"></div>
+			</div>
+			<div class="lt textcontent">
+				<div class="user-content clearfix">
+					<div class="lt">
+						<h3>Name goes here</h3>
+						<div class="status">
+							Current position
+						</div>
+					</div>
+					<div class="rt clearfix updates">
+						<div class="rt current-position emerald">100</div>
+						<div class="rt actions"><button class="btn">Roll</button></div>
+					</div>
+				</div>
+				<div class="user-content clearfix">
+					<div class="lt">
+						<h3>Name goes here</h3>
+						<div class="status">
+							Current position
+						</div>
+					</div>
+					<div class="rt clearfix updates">
+						<div class="rt current-position pumpkin">100</div>
+						<div class="rt actions"><button class="btn" disabled>Roll</button></div>
+					</div>
+				</div>
+				<div class="user-content clearfix">
+					<div class="lt user-details">
+						<h3>Name goes here</h3>
+						<div class="status">
+							Current position
+						</div>
+					</div>
+					<div class="rt clearfix updates">
+						<div class="rt current-position wisteria">100</div>
+						<div class="rt actions"><button class="btn" disabled>Roll</button></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+		<script>
+			function converted(x){
+				x = x - 1;
+				var iseven = !(parseInt(x / 10) % 2)
+					,r = x % 10
+					,extra = 2*r - 10;
+				return 100 - x + (iseven ? extra : -1);
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,300 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Snake N Ladder</title>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+	</head>
+	<body>
+		<script id='template' type='text/ractive'>
+			{{#showOverlays}}
+				<div class="layers" intro-outro="fade">
+					<div class="grey-layer" intro-outro="fade"></div>
+					{{#showNamesOverlay}}
+						<div class="names-layer" intro-outro="fade">
+							<div class="layer-title">
+								<h3>Hi! Please provide names of players</h3>
+							</div>
+							<form id="names-form" on-submit="startGame">
+								<div class="layer-content">
+									{{! maximum 3 players}}
+									<input type="text" name="name[]" value="{{player[0]}}" placeholder="First player" class="layer-input"/>
+									<input type="text" name="name[]" value="{{player[1]}}" placeholder="Second player" class="layer-input"/>
+									<input type="text" name="name[]" value="{{player[2]}}" placeholder="Third player" class="layer-input"/>
+								</div>
+								<div class="layer-footer">
+									<input class="btn start_but" type="submit" value="Start"/>
+								</div>
+							</form>
+						</div>
+						{{/showNamesOverlay}}
+					</div>
+				{{/showOverlays}}
+				{{#setBoard}}
+					<div class="clearfix">
+						<div class="main-board lt">
+							{{#players}}
+							{{! tokens for players.}}
+							<div class="player-token {{colorClass}}" style="left:{{#position}}{{left}}{{/}}px;top:{{#position}}{{top}}{{/}}px;"></div>
+							{{/players}}
+						</div>
+						<div class="lt textcontent">
+							{{#players:i}}
+								<div class="user-content clearfix">
+									<div class="lt user-details">
+										<h3>{{name}}</h3>
+										<div class="status">{{status}}</div>
+									</div>
+									<div class="rt clearfix updates">
+										<div class="rt current-position {{colorClass}}">{{score}}</div>
+										<div class="rt actions">
+											{{#toRoll}}
+												<button class="btn" on-click="letsRoll:{{i}}">Roll</button>
+											{{/toRoll}}
+										</div>
+									</div>
+								</div>
+							{{/players}}
+							<button class="btn" on-click="resetGame">Reset</button>
+						</div>
+					</div>
+				{{/setBoard}}
+    		</script>
+			<div id="content"></div>
+			<script src='js/ractive.min.js'></script>
+			<script src="js/ractive-transitions-fade.js"></script>
+			<script>
+			var snakes_ladders_helpers = {
+				//Snakes:- head : tail
+				snakes : {
+					17 : 7
+					,54 : 34
+					,62 : 19
+					,64 : 60
+					,87 : 24
+					,93 : 73
+					,95 : 75
+					,98 : 79
+				}
+				//Ladders:- base : top
+				,ladders : {
+					1 : 38
+					,4 : 14
+					,9 :  31
+					,21 : 42
+					,28 : 84
+					,51 : 67
+					,71 : 91
+					,80 : 100
+				}
+				/**
+				* function to check if the player got a ladder or bit by snake at the new position
+				*
+				* @param val : new position of user
+				*
+				* return an object with type, newvalue, oldvalue
+				* type : possible values are snake or ladder or false
+				* newvalue : new position of player incase of ladder or snake else same of given position
+				* oldvalue : given position in arguments (same as val)
+				*/
+				,check : function(val){
+					var type = !1,newvalue = 0;
+
+					if(val in this.snakes){
+						newvalue = this.snakes[val];
+						type = "snake";
+					}else if(val in this.ladders){
+						newvalue = this.ladders[val];
+						type = "ladder";
+					}
+
+					return {
+						type : type
+						,newvalue : newvalue || val
+						,oldvalue : val
+					};
+				}
+				/**
+				* function to convert player value to arrayIndex for calculation of position to place tokens on board
+				*
+				* @param p : score of player
+				*
+				* return integer (0 <= value <= 99)
+				*/
+				,convertToArrayIndex : function(p){
+					p = p - 1;
+					var iseven = !(parseInt(p / 10) % 2)//check if 10's value is even or not
+						,r = p % 10
+						,extra = 2*r - 10;
+					return 100 - p + (iseven ? extra : -1);
+				}
+				,getPositions : function(index,value){
+					var arrayIndex = this.convertToArrayIndex(value)
+						,cellHeight = 80
+						,cellWidth = 80
+						,x = arrayIndex % 10
+						,y = parseInt(arrayIndex/10)
+						,o = {
+							//adding extra 15 * indexOfPlayer,
+							//so that all tokens in a single box will be visible partially
+							left: x * cellWidth + (index * 15) + 5
+							//adding extra 35 to place the token in the lower half of box.
+							,top : (y) * cellHeight + 35
+						};
+
+					return o;
+				}
+			}
+			//initiate ractive
+			,ractive = new Ractive({
+				el: 'content',
+				template: '#template',
+				data: {
+					setBoard : false
+					,showOverlays : true
+					,showNamesOverlay : true
+					,players : []
+					//list of CSS classes for tokens
+					,colors : ["emerald","pumpkin","wisteria"]
+				}
+			});
+
+			//event handling
+			ractive.on({
+				/*
+				* this event creates the players with given names and enable the board.
+				*/
+				startGame : function(e){
+					e.original.preventDefault();
+
+					//get the players names from inputs of View
+					var playersArr = this.get("player");
+
+					//iterater over the names array to remove empty values
+					//and push the player objectes into "data" object
+					for(var x = 0;x < playersArr.length; x++){
+						if(typeof playersArr[x] == "string" && playersArr[x])
+							this.get("players").push({
+								name : playersArr[x] //set player name
+								,score : 0 //to track player's score
+								,colorClass : this.get("colors["+x+"]") //get the CSS color class for token
+								,status : "Waiting for chance..." //status updates
+								,toRoll : false //true if it is user's turn to play else false
+								,position : { //CSS positions for user's token
+									left : 0
+									,top : 0
+								}
+							});
+					}
+
+					//if players are available, hide the overlays and set the board
+					if(this.get('players').length){
+						this.set("showOverlays",false);
+						this.set("showNamesOverlay",false);
+						this.set("setBoard",true);
+
+						this.set("players.0.status","Please roll");
+						this.set("players.0.toRoll",true);
+					}
+				}
+
+				/*
+				* this event will handle the roll click
+				*/
+				,letsRoll : function(e,curIndex){
+					var newvalue = parseInt(Math.random() * 6) + 1 //Random value between 1 - 6
+						,oldScore = this.get(e.keypath + ".score")
+						,newScore = oldScore + newvalue
+						,checkSnakesLadders = snakes_ladders_helpers.check(newScore)
+						,playersSize = this.get('players').length
+						,nextPlayerIndex = -1 //to enable next player
+						,middlePosition = false //if user gets a ladder or snake, this will be used to animate the token
+						,self = this;
+
+					if(checkSnakesLadders.type == "ladder"){
+						//update the status of user
+						this.set(e.keypath + ".status", "Rolled "+ newvalue +", got a ladder at " + newScore + " and moved to " + checkSnakesLadders.newvalue);
+						
+						//get the middle position CSS values
+						middlePosition = snakes_ladders_helpers.getPositions(curIndex,newScore);
+
+						//update the score
+						newScore = checkSnakesLadders.newvalue;
+					}else if(checkSnakesLadders.type == "snake"){
+						//update the status
+						this.set(e.keypath + ".status", "Rolled "+ newvalue +", bit by snake at " + newScore + " and moved to " + checkSnakesLadders.newvalue);
+
+						//get the middle position
+						middlePosition = snakes_ladders_helpers.getPositions(curIndex,newScore);
+
+						//update the score
+						newScore = checkSnakesLadders.newvalue;
+					}else{
+						//update the status
+						this.set(e.keypath + ".status", "Rolled "+ newvalue + " and moved to " +newScore);
+					}
+
+					//lets check if the newScore is 100
+					//if so, then congratulate the user
+					if(newScore == 100){
+						this.set(e.keypath + ".status", "Congratulations!!! You have completed the game.");
+						this.set("players."+curIndex+".toRoll", false);
+					}else if(newScore > 100){
+						this.set(e.keypath + ".status", "Rolled "+ newvalue +". Need to roll "+ (100 - oldScore) +" to complete the game.");
+						newScore = oldScore;
+					}
+
+					//lets update the user's score
+					this.set(e.keypath + ".score", newScore);
+
+					//get the tokens CSS positions for newScore
+					var newPositions = snakes_ladders_helpers.getPositions(curIndex,newScore);
+
+					//animate the token
+					if(middlePosition){//if a middle position is available (incase of snake or ladder)
+						this.animate(e.keypath + ".position", middlePosition,{complete : function(){
+							self.animate(e.keypath + ".position", newPositions);
+						}});
+					}else{
+						this.animate(e.keypath + ".position", newPositions);
+					}
+
+					//loop through the users array to get the next user
+					for(var i = 1; i <= playersSize; i ++){
+						var index = (i + curIndex) % playersSize;
+						if(this.get('players.'+(index)+'.score') != 100){
+							nextPlayerIndex = index;
+							break;
+						}
+					}
+					
+					//if only single user is playing or user gets a ladder and score is not equal to 100
+					//then current user get the chance for next Roll
+					if((checkSnakesLadders.type == "ladder" || playersSize == 1) && newScore != 100 ){
+						nextPlayerIndex = curIndex;
+					}
+					
+					//disable the current player
+					this.set("players."+curIndex+".toRoll", false);
+
+					//enable the next player only if available
+					nextPlayerIndex >= 0 && this.set("players."+nextPlayerIndex+".toRoll", true);
+				}
+
+				/*
+				* This event will reset the game
+				*/
+				,resetGame : function(e){
+					//show the overlays
+					this.set("showOverlays",true);
+					this.set("showNamesOverlay",true);
+
+					//disable board
+					this.set("setBoard",false);
+
+					//remove existing players
+					this.splice("players",0,this.get('players').length);
+				}
+			});
+		</script>
+	</body>
+</html>

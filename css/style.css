@@ -1,0 +1,209 @@
+*{
+  margin:0;
+  padding:0;
+  border:0px none;
+  outline:none;
+  -webkit-font-smoothing: antialiased;
+  font-family: 'Open Sans', sans-serif;
+}
+
+li{
+  list-style-type:none;
+}
+
+a{
+  text-decoration:none;
+}
+
+h1,h2,h3,h4,h5,h6{
+  font-weight:normal;
+}
+
+.btn
+{
+  display: inline-block;
+  background-color: #45b5c1;
+  padding: 10px;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  border: medium none;
+  font-weight: bold;
+}
+.btn:hover {
+  background-color: #56CEDB;
+}
+
+.btn:active {
+  background-color: #56CEDB;
+}
+
+.btn[disabled]{
+  background-color: rgba(0,0,0,0);
+  cursor: default;
+  color: #333;
+}
+
+.lt{
+  float:left;
+}
+
+.rt{
+  float:right;
+}
+
+.clearfix:after{
+  clear: both;
+  content: ".";
+  display: block;
+  font-size: 0px;
+  height: 0px;
+  visibilty: hidden;
+}
+
+.layers {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+.layers .grey-layer {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.layers .names-layer{
+  width: 600px;
+  height: 310px;
+  background-color: #f0f1f2;
+  z-index: 1;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 5px;
+}
+
+.layer-title{
+  font-size: 18px;
+  background-color: #252525;
+  color: #fff;
+  padding: 10px;
+  margin: 0;
+  border-radius: 4px 4px 0 0;
+  text-align: center;
+}
+
+.layer-content{
+  padding:20px;
+}
+
+.layer-footer {
+  position: absolute;
+  bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.names-layer .layer-input{
+  height: 29px;
+  padding: 8px 12px;
+  font-size: 15px;
+  color: #34495e;
+  border: 2px solid #bdc3c7;
+  border-radius: 6px;
+  box-shadow: none;
+  display: block;
+  margin-bottom: 10px;
+  width:95%;
+}
+
+.names-layer .layer-input:focus{
+  border-color: #45b5c1;
+  outline: 0;
+  box-shadow: none;
+}
+
+.main-board{
+  background-image: url(../images/snakes_and_ladders_game_board_cropped_1.jpg);
+  height: 800px;
+  width: 800px;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  position: relative;
+}
+
+.player-token{
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  border-radius: 20px;
+  left:780px;
+  top:10px;
+}
+
+.emerald{
+  background-color: #2ecc71;
+}
+
+.pumpkin{
+  background-color: #d35400;
+}
+
+.wisteria{
+  background-color: #8e44ad;
+}
+
+.textcontent{
+  padding: 15px;
+  height: 770px;
+  width: 400px;
+}
+
+.user-details{
+  width: 300px;
+}
+
+.user-content h3{
+  font-size:20px;
+  padding-bottom: 5px;
+  font-weight: bold;
+}
+
+.user-content .status{
+  padding-bottom: 15px;
+}
+
+.user-content .updates {
+    padding-top: 10px;
+}
+
+.user-content .updates .actions{
+  margin-right:10px;
+  margin-top: 3px;
+}
+
+.user-content .current-position{
+  height: 40px;
+  width: 40px;
+  border-radius: 20px;
+  color: #FFF;
+  text-align: center;
+  line-height: 41px;
+  font-weight: 600;
+}
+
+
+
